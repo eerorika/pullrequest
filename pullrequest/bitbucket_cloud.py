@@ -7,7 +7,7 @@ bb_api_root = 'https://api.bitbucket.org'
 
 
 def create(key, secret, repository, title, description, head, base='master', reviewer=None, close_source_branch=False,
-           *_):
+           **_):
     if not reviewer:
         reviewer = []
     auth_headers = bb_authenticate(key, secret)
@@ -23,11 +23,11 @@ def create(key, secret, repository, title, description, head, base='master', rev
         'close_source_branch': close_source_branch,
     }
     url = '{}/2.0/repositories/{}/pullrequests'.format(bb_api_root, repository)
-    requests.post(
+    return requests.post(
         url=url,
         json=payload,
         headers=auth_headers,
-    )
+    ).content
 
 
 def bb_authenticate(key, secret):

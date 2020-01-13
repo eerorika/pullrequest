@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+from sys import stdout
 
 
 def main():
@@ -24,7 +25,8 @@ def main():
     default_service = next(iter(services))
 
     try:
-        current_branch = str(subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']))
+        current_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])\
+            .decode(stdout.encoding).strip()
         if ' ' in current_branch:
             current_branch = None
     except subprocess.CalledProcessError:
@@ -52,19 +54,20 @@ def main():
 
     if not args.service:
         try:
-            remote_url = str(subprocess.check_output(['git', ' remote', 'get-url', '--push', args.remote]))
+            remote_url = subprocess.check_output(['git', 'remote', 'get-url', '--push', args.remote])\
+                .decode(stdout.encoding).strip()
         except subprocess.CalledProcessError:
             remote_url = None
         if not args.service:
-            args.service = default_service
-            if not args.url:
-                args.url = 'https://gitlab.com/'
-        elif remote_url:
-            for service in services.keys():
-                if service in remote_url:
-                    args.service = service
+            if remote_url:
+                for service in services.keys():
+                    if service in remote_url:
+                        args.service = service
             if not args.service:
                 args.service = default_service
+
+    if args.service == 'gitlab' and not args.url:
+        args.url = 'https://gitlab.com/'
 
     print('Using service <{}>'.format(args.service))
 
@@ -81,7 +84,7 @@ def main():
         subprocess.check_call(['git', 'commit', '-A', '.', '-m', args.title])
     elif not args.title:
         try:
-            args.title = subprocess.check_output(['git', 'log', '-1', '--pretty=%B'])
+            args.title = subprocess.check_output(['git', 'log', '-1', '--pretty=%B']).decode(stdout.encoding).strip()
         except subprocess.CalledProcessError:
             pass
 
@@ -90,7 +93,9 @@ def main():
 
     print('Creating pull request')
     create = services[args.service]
-    create(**vars(args))
+    result = create(**vars(args))
+    print(result)
+    pass
 
 
 if __name__ == '__main__':

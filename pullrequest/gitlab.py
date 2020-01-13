@@ -2,7 +2,7 @@ from gitlab import Gitlab
 
 
 def create(key, repository, title, description, head, base='master', close_source_branch=False, reviewer=None,
-           label=None, url='https://gitlab.com/', *_):
+           label=None, url='https://gitlab.com/', **_):
     if not reviewer:
         reviewer = []
     gl = Gitlab(url=url, private_token=key)
@@ -13,7 +13,7 @@ def create(key, repository, title, description, head, base='master', close_sourc
     ]
     project_id = gl_id(repository, gl.projects)
     project = gl.projects.get(project_id)
-    project.mergerequests.create({
+    mr = project.mergerequests.create({
         'title': title,
         'description': description,
         'source_branch': head,
@@ -22,6 +22,7 @@ def create(key, repository, title, description, head, base='master', close_sourc
         'assignee_ids': assignee_ids,
         'remove_source_branch': close_source_branch,
     })
+    return str(mr)
 
 
 def is_integral(var):
