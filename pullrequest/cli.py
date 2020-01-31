@@ -81,7 +81,7 @@ def main():
 
     if args.commit:
         print('Committing changes')
-        subprocess.check_call(['git', 'commit', '-a', '.', '-m', args.title])
+        subprocess.check_call(['git', 'commit', '-a', '-m', args.title])
     elif not args.title:
         try:
             args.title = subprocess.check_output(['git', 'log', '-1', '--pretty=%B']).decode(stdout.encoding).strip()
