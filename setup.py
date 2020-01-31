@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pullrequest',
-    version='0.1.3',
+    version='0.1.4',
     author='Eero Rikalainen',
     author_email='eerorika@gmail.com',
     url='https://github.com/eerorika/pullrequest',
